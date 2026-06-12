@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório — Restaurante Brandão</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn">&#8592;</a>
+    <h1>Relatório do Dia</h1>
+  </div>
+  <span id="data-hoje"></span>
+</div>
+
+<div class="container">
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Categoria</th>
+          <th>Qtd</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-vendas">
+        <tr><td colspan="4" class="empty">Nenhuma venda registrada hoje.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:13px; color:#888; margin-bottom:10px; font-weight:500;">Movimentações de caixa</h3>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Tipo</th>
+          <th>Descrição</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-caixa">
+        <tr><td colspan="4" class="empty">Nenhuma movimentação hoje.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="totals-card">
+    <div class="total-row">
+      <span class="lbl">Total vendas (marmitas)</span>
+      <span class="val" id="tot-marmita">R$ 0,00</span>
+    </div>
+    <div class="total-row">
+      <span class="lbl">Total vendas (buffet)</span>
+      <span class="val" id="tot-buffet">R$ 0,00</span>
+    </div>
+    <div class="total-row">
+      <span class="lbl">Total vendas (iFood)</span>
+      <span class="val" id="tot-ifood">R$ 0,00</span>
+    </div>
+    <div class="total-row">
+      <span class="lbl">Entradas no caixa</span>
+      <span class="val" id="tot-entradas">R$ 0,00</span>
+    </div>
+    <div class="total-row">
+      <span class="lbl">Saídas no caixa</span>
+      <span class="val" id="tot-saidas">R$ 0,00</span>
+    </div>
+    <div class="total-row final">
+      <span class="lbl">Saldo final do dia</span>
+      <span class="val" id="tot-saldo">R$ 0,00</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR');
+
+  const vendas = DB.getVendasHoje();
+  const movs = DB.getMovimentosHoje();
+
+  const badges = { Marmita: 'badge-blue', Buffet: 'badge-green', iFood: 'badge-amber' };
+
+  const tbVendas = document.getElementById('tabela-vendas');
+  if (vendas.length > 0) {
+    tbVendas.innerHTML = vendas.map(v => `
+      <tr>
+        <td>${v.hora}</td>
+        <td><span class="badge ${badges[v.categoria] || ''}">${v.categoria}</span></td>
+        <td>${v.quantidade}</td>
+        <td>${formatBRL(v.valor)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const tbCaixa = document.getElementById('tabela-caixa');
+  if (movs.length > 0) {
+    tbCaixa.innerHTML = movs.map(m => `
+      <tr>
+        <td>${m.hora}</td>
+        <td><span class="badge ${m.tipo === 'entrada' ? 'badge-green' : 'badge-amber'}">${m.tipo === 'entrada' ? 'Entrada' : 'Saída'}</span></td>
+        <td>${m.descricao}</td>
+        <td>${formatBRL(m.valor)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const marmita = totalPorCategoria(vendas, 'Marmita');
+  const buffet = totalPorCategoria(vendas, 'Buffet');
+  const ifood = totalPorCategoria(vendas, 'iFood');
+  const entradas = totalEntradas(movs);
+  const saidas = totalSaidas(movs);
+  const saldo = entradas - saidas;
+
+  document.getElementById('tot-marmita').textContent = formatBRL(marmita);
+  document.getElementById('tot-buffet').textContent = formatBRL(buffet);
+  document.getElementById('tot-ifood').textContent = formatBRL(ifood);
+  document.getElementById('tot-entradas').textContent = formatBRL(entradas);
+  document.getElementById('tot-saidas').textContent = formatBRL(saidas);
+  document.getElementById('tot-saldo').textContent = formatBRL(saldo);
+</script>
+</body>
+</html>

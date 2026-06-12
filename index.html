@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restaurante Brandão</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>🍽️ Restaurante Brandão</h1>
+  </div>
+  <span id="data-hoje"></span>
+</div>
+
+<div class="container">
+
+  <div class="cards-grid">
+    <div class="metric-card">
+      <div class="label">Marmitas</div>
+      <div class="value" id="total-marmita">R$ 0,00</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Buffet</div>
+      <div class="value" id="total-buffet">R$ 0,00</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">iFood</div>
+      <div class="value" id="total-ifood">R$ 0,00</div>
+    </div>
+  </div>
+
+  <div class="cards-grid-2">
+    <div class="metric-card green">
+      <div class="label">Entradas no caixa</div>
+      <div class="value" id="total-entradas">R$ 0,00</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Saldo do dia</div>
+      <div class="value" id="saldo-dia">R$ 0,00</div>
+    </div>
+  </div>
+
+  <div class="chart-box">
+    <h3>📊 Vendas por categoria</h3>
+    <div class="bars" id="chart-bars">
+      <div class="bar-wrap">
+        <div class="bar-val" id="chart-val-marmita">R$ 0</div>
+        <div class="bar" id="bar-marmita" style="height:4px; background:#2E4A8C;"></div>
+        <div class="bar-lbl">Marmitas</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val" id="chart-val-buffet">R$ 0</div>
+        <div class="bar" id="bar-buffet" style="height:4px; background:#1D9E75;"></div>
+        <div class="bar-lbl">Buffet</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val" id="chart-val-ifood">R$ 0</div>
+        <div class="bar" id="bar-ifood" style="height:4px; background:#EF9F27;"></div>
+        <div class="bar-lbl">iFood</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <a href="venda.html" class="action-btn">
+      <span class="icon">🛒</span>
+      Nova Venda
+    </a>
+    <a href="caixa.html" class="action-btn">
+      <span class="icon">💵</span>
+      Caixa
+    </a>
+    <a href="relatorio.html" class="action-btn">
+      <span class="icon">📋</span>
+      Relatório
+    </a>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.getElementById('data-hoje').textContent = dataFormatada();
+
+  const vendas = DB.getVendasHoje();
+  const movs = DB.getMovimentosHoje();
+
+  const marmita = totalPorCategoria(vendas, 'Marmita');
+  const buffet = totalPorCategoria(vendas, 'Buffet');
+  const ifood = totalPorCategoria(vendas, 'iFood');
+  const entradas = totalEntradas(movs);
+  const saidas = totalSaidas(movs);
+  const saldo = entradas - saidas;
+
+  document.getElementById('total-marmita').textContent = formatBRL(marmita);
+  document.getElementById('total-buffet').textContent = formatBRL(buffet);
+  document.getElementById('total-ifood').textContent = formatBRL(ifood);
+  document.getElementById('total-entradas').textContent = formatBRL(entradas);
+  document.getElementById('saldo-dia').textContent = formatBRL(saldo);
+
+  // Gráfico de barras
+  const maxVal = Math.max(marmita, buffet, ifood, 1);
+  const maxH = 90;
+
+  document.getElementById('bar-marmita').style.height = Math.max(4, (marmita / maxVal) * maxH) + 'px';
+  document.getElementById('bar-buffet').style.height = Math.max(4, (buffet / maxVal) * maxH) + 'px';
+  document.getElementById('bar-ifood').style.height = Math.max(4, (ifood / maxVal) * maxH) + 'px';
+
+  document.getElementById('chart-val-marmita').textContent = formatBRL(marmita);
+  document.getElementById('chart-val-buffet').textContent = formatBRL(buffet);
+  document.getElementById('chart-val-ifood').textContent = formatBRL(ifood);
+</script>
+</body>
+</html>
