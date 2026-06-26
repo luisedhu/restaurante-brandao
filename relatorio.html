@@ -116,9 +116,10 @@
   const marmita = totalPorCategoria(vendas, 'Marmita');
   const buffet = totalPorCategoria(vendas, 'Buffet');
   const ifood = totalPorCategoria(vendas, 'iFood');
+  const totalVendas = marmita + buffet + ifood;
   const entradas = totalEntradas(movs);
   const saidas = totalSaidas(movs);
-  const saldo = entradas - saidas;
+  const saldo = totalVendas + entradas - saidas;
 
   document.getElementById('tot-marmita').textContent = formatBRL(marmita);
   document.getElementById('tot-buffet').textContent = formatBRL(buffet);
